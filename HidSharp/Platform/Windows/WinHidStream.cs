@@ -40,19 +40,22 @@ namespace HidSharp.Platform.Windows
             NativeMethods.CloseHandle(_closeEventHandle);
         }
 
-        internal void Init(string path)
+        internal void Init(string path, NativeMethods.EFileAccess desiredAccess)
         {
-            IntPtr handle = NativeMethods.CreateFileFromDevice(path, NativeMethods.EFileAccess.Read | NativeMethods.EFileAccess.Write, NativeMethods.EFileShare.Read | NativeMethods.EFileShare.Write);
+            IntPtr handle = NativeMethods.CreateFileFromDevice(path, desiredAccess, NativeMethods.EFileShare.Read | NativeMethods.EFileShare.Write);
             if (handle == (IntPtr)(-1))
             {
                 throw DeviceException.CreateIOException(Device, "Unable to open HID class device (" + path + ").");
             }
 
-            int maxInputBuffers = Environment.OSVersion.Version >= new Version(5, 1) ? 512 : 200; // Windows 2000 supports 200. Windows XP supports 512.
-            if (!NativeMethods.HidD_SetNumInputBuffers(handle, maxInputBuffers))
+            if ((desiredAccess & NativeMethods.EFileAccess.Read) != 0)
             {
-                NativeMethods.CloseHandle(handle);
-                throw new IOException("Failed to set input buffers.", new Win32Exception());
+                int maxInputBuffers = Environment.OSVersion.Version >= new Version(5, 1) ? 512 : 200; // Windows 2000 supports 200. Windows XP supports 512.
+                if (!NativeMethods.HidD_SetNumInputBuffers(handle, maxInputBuffers))
+                {
+                    NativeMethods.CloseHandle(handle);
+                    throw new IOException("Failed to set input buffers.", new Win32Exception());
+                }
             }
 
 			_handle = handle;

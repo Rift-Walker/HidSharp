@@ -30,7 +30,7 @@ using HidSharp.Utility;
 
 namespace HidSharp.Platform.Windows
 {
-    unsafe static class NativeMethods
+    unsafe public static class NativeMethods
     {
         public static readonly Guid GuidForBluetoothLEDevice = new Guid("{781AEE18-7733-4CE4-ADD0-91F41C67B592}");
         public static readonly Guid GuidForBluetoothHciEvent = new Guid("{FC240062-1541-49BE-B463-84C4DCD7BF7F}");

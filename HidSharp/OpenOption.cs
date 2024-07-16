@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using HidSharp.Platform.Windows;
 
 namespace HidSharp
 {
@@ -79,6 +80,14 @@ namespace HidSharp
 
         internal static OpenOption BleService { get; private set; }
 
+        /// <summary>
+        /// The access level to request when getting the device.
+        /// For certain devices, this has to be set to 0, but feature reports can still be exchanged.
+        ///
+        /// </summary>
+        public static OpenOption RequestedAccess{ get; private set; }
+
+
         OpenOptionDeserializeCallback _deserializeCallback;
         OpenOptionSerializeCallback _serializeCallback;
 
@@ -128,6 +137,12 @@ namespace HidSharp
                                         serializeCallback: _ => { throw new NotImplementedException(); },
                                         defaultValue: null,
                                         friendlyName: "BLE Service");
+
+            RequestedAccess = OpenOption.New(new Guid("{68F4ED4F-7DC8-4648-A29D-E9EA9FE5E1B1}"),
+                                        deserializeCallback: _ => { throw new NotImplementedException(); },
+                                        serializeCallback: _ => { throw new NotImplementedException(); },
+                                        defaultValue: NativeMethods.EFileAccess.Read | NativeMethods.EFileAccess.Write,
+                                        friendlyName: "Requested Access Level");
         }
 
         OpenOption()
